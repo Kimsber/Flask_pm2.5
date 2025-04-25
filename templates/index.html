@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>首頁</title>
     <style>
         body {
             background-color: #ebe3bc;
@@ -18,6 +18,29 @@
 <body>
     <h1>歡迎登入，{{name}}</h1>
     <h2>目前時間:{{now}}</h2>
+
+    <form action="/bmi">
+        <label for="">身高</label>
+        <input type="number" , name="height">
+        <label for="">體重</label>
+        <input type="number" , name="weight">
+
+        <button type="submit">計算</button>
+    </form>
+
+    {{% if books %}}
+    {{% for book in books%}}
+    <h2>{{book["name"]}}</h2>
+    <img src="{{book[image_url]}}" alt="">
+    <h3>{{book["price"]}}</h3>
+    {{% endfor %}}
+
+    {{% else %}}
+    <h2>目前沒有書籍</h2>
+    {{% endif %}}
+
+    <br>
+    <a href="/pm25_data">pm2.5-data</a>
 </body>
 
 </html>
