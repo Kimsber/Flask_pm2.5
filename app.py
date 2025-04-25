@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request
 from datetime import datetime
-import pymysql
+
+# import pymysql
 import pandas as pd
 
 app = Flask(__name__)
@@ -45,7 +46,8 @@ def index():
 def get_bmi():
     height = request.args.get(height)
     weight = request.args.get(weight)
-    bmi = eval(weight) / (eval(height) / 100 * eval(height)) / 100
+    bmi = round(eval(weight) / (eval(height) / 100) ** 2, 2)
+    return render_template("bmi.html", bmi=bmi)
 
 
 @app.route("/pm25_data")
