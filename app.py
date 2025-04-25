@@ -1,14 +1,21 @@
 from flask import Flask, render_template, request
 from datetime import datetime
-
-# import pymysql
+import pymysql
 import pandas as pd
+from pm25 import get_pm25_data
 
 app = Flask(__name__)
 
 
 @app.route("/")
 def index():
+    datas = get_pm25_data()
+    print(datas)
+    return render_template("index.html", datas=datas)
+
+
+@app.route("/books")
+def books():
     books = [
         {
             "name": "Python book",
@@ -35,7 +42,6 @@ def index():
     else:
         print("No books found")
 
-    # return f"<h1>Hello, World!</h1><br>{datetime.now()}"
     user = "John Doe"
     date = datetime.now().strftime("%Y-%m-%d")
     print(user, date)
@@ -59,4 +65,5 @@ def get_pm25_data():
     return df1.values.tolist()
 
 
-app.run(debug=True)
+if __name__ == "__main__":
+    app.run(debug=True)
