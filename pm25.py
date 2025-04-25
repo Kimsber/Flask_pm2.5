@@ -29,6 +29,7 @@ def get_pm25_data():
 
     except Exception as e:
         print("Error executing SQL query:", e)
+
     finally:
         if conn is not None:
             conn.close()
