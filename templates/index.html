@@ -12,12 +12,40 @@
             text-align: center;
             padding: 50px;
         }
+
+        table {
+            width: 80%;
+            margin: 0 auto;
+        }
+
+        th {
+            background: #d3c47a;
+            padding: 10px;
+            text-align: center;
+        }
     </style>
 </head>
 
 <body>
-    <h1>PM2.5</h1>
-    <a href="/pm25_data">pm2.5-data</a>
+    <h2>細懸浮微粒(PM2.5)資料</h2>
+    <table border="1">
+        <thead>
+            <tr>
+                {% for column in columns %}
+                <th>{{column}}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for data in datas %}
+            <tr>
+                {% for item in data %}
+                <td>{{item}}</td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+    </table>
 </body>
+
 
 </html>

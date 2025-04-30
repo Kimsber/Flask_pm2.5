@@ -1,6 +1,5 @@
 from flask import Flask, render_template, request
 from datetime import datetime
-import pymysql
 import pandas as pd
 from pm25 import get_pm25_data
 
@@ -9,13 +8,13 @@ app = Flask(__name__)
 
 @app.route("/")
 def index():
-    datas = get_pm25_data()
-    print(datas)
-    return render_template("index.html", datas=datas)
+    datas, columns = get_pm25_data()
+    # print(datas, columns)
+    return render_template("index.html", **locals())
 
 
 @app.route("/books")
-def books():
+def books_recommand():
     books = [
         {
             "name": "Python book",
@@ -42,27 +41,18 @@ def books():
     else:
         print("No books found")
 
-    user = "John Doe"
-    date = datetime.now().strftime("%Y-%m-%d")
-    print(user, date)
-    return render_template("index.html", name=user, now=date, books=books)
+    username = "Kim"
+    login_time = datetime.now().strftime("%Y-%m-%d")
+    print(username, login_time)
+    return render_template("books.html", name=username, time=login_time, books=books)
 
 
 @app.route("/bmi")
 def get_bmi():
-    height = request.args.get(height)
-    weight = request.args.get(weight)
-    bmi = round(eval(weight) / (eval(height) / 100) ** 2, 2)
-    return render_template("bmi.html", bmi=bmi)
-
-
-@app.route("/pm25_data")
-def get_pm25_data():
-    api_url = "https://data.moenv.gov.tw/api/v2/aqx_p_02?api_key=540e2ca4-41e1-4186-8497-fdd67024ac44&limit=1000&sort=datacreationdate%20desc&format=CSV"
-    df = pd.read_csv(api_url)
-    df["datacreationdate"] = pd.to_datetime(df["datacreationdate"])
-    df1 = df.dropna()
-    return df1.values.tolist()
+    height = eval(request.args.get("height"))
+    weight = eval(request.args.get("weight"))
+    bmi = round(weight / (height / 100) ** 2, 2)
+    return render_template("bmi.html", **locals())
 
 
 if __name__ == "__main__":
