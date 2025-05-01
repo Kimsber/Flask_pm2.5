@@ -17,6 +17,41 @@ def open_db():
     return conn
 
 
+def update_db():
+    api_url = "https://data.moenv.gov.tw/api/v2/aqx_p_02?api_key=540e2ca4-41e1-4186-8497-fdd67024ac44&limit=1000&sort=datacreationdate%20desc&format=CSV"
+    sqlstr = """
+        insert ignore into pm25(site,county,pm25,datacreationdate,itemunit) 
+        value(%s, %s, %s, %s, %s)
+        """
+    row_counts = 0
+    message = ""
+    try:
+        # 取得最新資料
+        df = pd.read_csv(api_url)
+        df["datacreationdate"] = pd.to_datetime(df["datacreationdate"])
+        df1 = df.dropna()
+        values = df1.values.tolist()
+        # 寫入資料庫
+        conn = open_db()
+        cur = conn.cursor()
+        cur.executemany(sqlstr, values)
+        row_counts = cur.rowcount
+        conn.commit()
+
+        print(f"更新{row_counts}筆資料")
+        message = "更新成功"
+
+    except Exception as e:
+        print("Error connecting to database:", e)
+        message = f"更新失敗:{e}"
+
+    finally:
+        if conn is not None:
+            conn.close()
+
+    return row_counts, message
+
+
 def get_pm25_data():
     conn = None
     datas = None
@@ -38,8 +73,4 @@ def get_pm25_data():
 
 
 if __name__ == "__main__":
-    conn = open_db()
-    print(conn)
-    datas, columns = get_pm25_data()
-    print(datas)
-    print(columns)
+    update_db()

@@ -1,9 +1,21 @@
 from flask import Flask, render_template, request
 from datetime import datetime
 import pandas as pd
-from pm25 import get_pm25_data
+from pm25 import get_pm25_data, update_db
+import json
 
 app = Flask(__name__)
+
+
+@app.route("/update_db")
+def update_pm25():
+    row_counts, message = update_db()
+    time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    result = json.dumps(
+        {"更新比數": row_counts, "結果": message, "時間": time}, ensure_ascii=False
+    )
+
+    return result
 
 
 @app.route("/")

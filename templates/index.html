@@ -28,10 +28,11 @@
 
 <body>
     <h2>細懸浮微粒(PM2.5)資料</h2>
+    <a href="/update_db">更新資料</a>
     <table border="1">
         <thead>
             <tr>
-                {% for column in columns %}
+                {% for column in columns[1:] %}
                 <th>{{column}}</th>
                 {% endfor %}
             </tr>
@@ -39,7 +40,7 @@
         <tbody>
             {% for data in datas %}
             <tr>
-                {% for item in data %}
+                {% for item in data[1:] %}
                 <td>{{item}}</td>
                 {% endfor %}
             </tr>
