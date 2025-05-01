@@ -18,11 +18,48 @@ def update_pm25():
     return result
 
 
+@app.route("/filter", methods=["POST"])
+def filter_county():
+    county = request.form.get("county")
+    datas, columns = get_pm25_data()
+    df = pd.DataFrame(datas, columns=columns)
+    # 取得特定縣市資料
+    df1 = df.groupby("county").get_group(county).groupby("site")["pm25"].mean()
+    print(df1)
+
+    return {"county": county}
+
+
 @app.route("/")
 def index():
+    # 取得最新資料
     datas, columns = get_pm25_data()
-    # print(datas, columns)
-    return render_template("index.html", **locals())
+    # 取出不同縣市資料
+    df = pd.DataFrame(datas, columns=columns)
+    # 排序縣市
+    counties = sorted(df["county"].unique().tolist())
+    # print(counties)
+
+    # 取得特定縣市資料(預設ALL)
+    county = request.args.get("county", "全部縣市")
+    if county != "全部縣市":
+        df1 = df.groupby("county").get_group(county)
+        columns = df1.columns.tolist()
+        datas = df1.values.tolist()
+
+    x = df["site"].tolist()
+    y = df["pm25"].tolist()
+    # print(columns, datas)
+
+    return render_template(
+        "index.html",
+        columns=columns,
+        datas=datas,
+        counties=counties,
+        selected_county=county,
+        x_data=x,
+        y_data=y,
+    )
 
 
 @app.route("/books")

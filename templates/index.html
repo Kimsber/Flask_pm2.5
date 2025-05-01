@@ -5,13 +5,32 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>首頁</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.6.0/dist/echarts.min.js"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 
 <body>
     <h2>細懸浮微粒(PM2.5)資料</h2>
     <h3>最新更新時間:{{datas[0][4]}}</h3>
+
+    <div id="main" style="width: 1600px;height:900px;"></div>
+
+
     <a class="btn-update" href="/update_db">更新資料</a>
+
+    <form action="/" method="GET">
+        <label for="">縣市選擇</label>
+        <!-- 縣市選擇框 -->
+        <select name="county" id="county">
+            <option value="全部縣市">全部縣市</option>
+            {% for county in counties %}
+            <option value="{{county}}" {% if selected_county==county %} selected {% endif %}>{{county}}</option>
+            {% endfor %}
+        </select>
+        <button type="submit">查詢</button>
+    </form>
+
+    <h2 style="margin-left: 64px; color: darkblue;">選擇縣市:{{selected_county}}</h2>
     <table border="1">
         <thead>
             <tr>
@@ -29,6 +48,45 @@
             </tr>
             {% endfor %}
     </table>
+
+    <div id="chart-data" data-labels="{{x_data | tojson | safe}}" data-values="{{y_data | tojson | safe}}"></div>
+
+    <script type="text/javascript">
+        const ChartData = document.querySelector("chart-data");
+        const labels = JSON.parse(ChartData.dataset.labels);
+        const values = JSON.parse(ChartData.dataset.values);
+
+        console.log(ChartData, labels, values);
+
+        // 基於準備好的dom，初始化echarts實例
+        var myChart = echarts.init(document.getElementById('main'));
+
+        // 指定圖表的配置項目和數據
+        var option = {
+            title: {
+                text: '各測站PM2.5偵測量'
+            },
+            tooltip: {},
+            legend: {
+                data: ['μg/m3']
+            },
+            xAxis: {
+                data: labels
+            },
+            yAxis: {},
+            series: [
+                {
+                    name: '偵測量',
+                    type: 'bar',
+                    data: values,
+                }
+            ]
+        };
+
+        // 使用剛指定的配置項和資料顯示圖表
+        myChart.setOption(option);
+    </script>
+
 </body>
 
 
