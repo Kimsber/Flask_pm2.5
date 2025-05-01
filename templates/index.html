@@ -5,30 +5,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>首頁</title>
-    <style>
-        body {
-            background-color: #ebe3bc;
-            font-family: Arial, sans-serif;
-            text-align: center;
-            padding: 50px;
-        }
-
-        table {
-            width: 80%;
-            margin: 0 auto;
-        }
-
-        th {
-            background: #d3c47a;
-            padding: 10px;
-            text-align: center;
-        }
-    </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 
 <body>
     <h2>細懸浮微粒(PM2.5)資料</h2>
-    <a href="/update_db">更新資料</a>
+    <h3>最新更新時間:{{datas[0][4]}}</h3>
+    <a class="btn-update" href="/update_db">更新資料</a>
     <table border="1">
         <thead>
             <tr>
