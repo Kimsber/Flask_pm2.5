@@ -42,12 +42,17 @@ def index():
 
     # 取得特定縣市資料(預設ALL)
     county = request.args.get("county", "全部縣市")
-    if county != "全部縣市":
+    if county == "全部縣市":
+        # 取得所有縣市的平均值，以縣市為單位
+        df1 = df.groupby("county")["pm25"].mean().reset_index()
+        x_data = df1["county"].tolist()
+    else:
+        # 取得特定縣市資料，以測站為單位
         df = df.groupby("county").get_group(county)
-        columns = df.columns.tolist()
-        datas = df.values.tolist()
+        x_data = df["site"].tolist()
 
-    x_data = df["site"].tolist()
+    columns = df.columns.tolist()
+    datas = df.values.tolist()
     y_data = df["pm25"].tolist()
     # print(columns, datas)
 
