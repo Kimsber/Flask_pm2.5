@@ -7,14 +7,22 @@
     <title>首頁</title>
     <script src="https://cdn.jsdelivr.net/npm/echarts@5.6.0/dist/echarts.min.js"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        #main {
+            width: 800px;
+            height: 450px;
+            align-items: center;
+            text-align: center;
+            margin: 0 auto;
+        }
+    </style>
 </head>
 
 <body>
     <h2>細懸浮微粒(PM2.5)資料</h2>
     <h3>最新更新時間:{{datas[0][4]}}</h3>
 
-    <div id="main" style="width: 1600px;height:900px;"></div>
-
+    <div id="main"></div>
 
     <a class="btn-update" href="/update_db">更新資料</a>
 
@@ -49,10 +57,10 @@
             {% endfor %}
     </table>
 
-    <div id="chart-data" data-labels="{{x_data | tojson | safe}}" data-values="{{y_data | tojson | safe}}"></div>
+    <div id="chart-data" data-labels='{{ x_data | tojson }}' data-values='{{ y_data | tojson }}'></div>
 
     <script type="text/javascript">
-        const ChartData = document.querySelector("chart-data");
+        const ChartData = document.querySelector("#chart-data");
         const labels = JSON.parse(ChartData.dataset.labels);
         const values = JSON.parse(ChartData.dataset.values);
 

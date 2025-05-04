@@ -25,7 +25,7 @@ def filter_county():
     df = pd.DataFrame(datas, columns=columns)
     # 取得特定縣市資料
     df1 = df.groupby("county").get_group(county).groupby("site")["pm25"].mean()
-    print(df1)
+    # print(df1)
 
     return {"county": county}
 
@@ -43,12 +43,12 @@ def index():
     # 取得特定縣市資料(預設ALL)
     county = request.args.get("county", "全部縣市")
     if county != "全部縣市":
-        df1 = df.groupby("county").get_group(county)
-        columns = df1.columns.tolist()
-        datas = df1.values.tolist()
+        df = df.groupby("county").get_group(county)
+        columns = df.columns.tolist()
+        datas = df.values.tolist()
 
-    x = df["site"].tolist()
-    y = df["pm25"].tolist()
+    x_data = df["site"].tolist()
+    y_data = df["pm25"].tolist()
     # print(columns, datas)
 
     return render_template(
@@ -57,8 +57,8 @@ def index():
         datas=datas,
         counties=counties,
         selected_county=county,
-        x_data=x,
-        y_data=y,
+        x_data=x_data,
+        y_data=y_data,
     )
 
 
