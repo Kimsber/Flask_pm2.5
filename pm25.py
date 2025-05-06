@@ -52,6 +52,64 @@ def update_db():
     return row_counts, message
 
 
+def get_all_counties():
+    conn = None
+    counties = []
+    try:
+        conn = open_db()
+        cur = conn.cursor()
+        sqlstr = "SELECT distinct county FROM pm25;"
+        cur.execute(sqlstr)
+        datas = cur.fetchall()
+        counties = [data[0] for data in datas]
+
+    except Exception as e:
+        print(e)
+    finally:
+        if conn is not None:
+            conn.close()
+    return counties
+
+
+def get_all_sites(county):
+    conn = None
+    sites = []
+    try:
+        conn = open_db()
+        cur = conn.cursor()
+        sqlstr = "SELECT distinct site FROM pm25 where county=%s;"
+        cur.execute(sqlstr, (county,))
+        datas = cur.fetchall()
+        sites = [data[0] for data in datas]
+
+    except Exception as e:
+        print(e)
+    finally:
+        if conn is not None:
+            conn.close()
+    return sites
+
+
+def get_pm25_by_site(county, site):
+    conn = None
+    datas = None
+    colnames = None
+    try:
+        conn = open_db()
+        cur = conn.cursor()
+        sqlstr = "SELECT * FROM pm25 where county = %s and site = %s;"
+        cur.execute(sqlstr, (county, site))
+        # print(cur.description)
+        columns = [i[0] for i in cur.description]
+        datas = cur.fetchall()
+    except Exception as e:
+        print("Error executing SQL query:", e)
+    finally:
+        if conn is not None:
+            conn.close()
+    return datas, columns
+
+
 def get_pm25_data():
     conn = None
     datas = None
@@ -73,4 +131,6 @@ def get_pm25_data():
 
 
 if __name__ == "__main__":
-    update_db()
+    # get_pm25_by_site("臺北市", "大同")
+    # print(get_all_counties())
+    get_all_sites("臺北市")

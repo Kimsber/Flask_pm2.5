@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>首頁</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.6.0/dist/echarts.min.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        #main {
+            width: 800px;
+            height: 450px;
+            align-items: center;
+            text-align: center;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+
+<body>
+    <h2>{{site}}細懸浮微粒(PM2.5)資料</h2>
+    <h3>選擇縣市</h3>
+    <!-- 縣市選擇框 -->
+    <select name="county" id="county">
+        {% for county in counties %}
+        <option value="{{county}}" {% if selected_county==county %} selected {% endif %}>{{county}}</option>
+        {% endfor %}
+    </select>
+
+    <h3>選擇站點</h3>
+    <select name="site" id="site">
+        <option value="大同">大同</option>
+        <option value="富貴角">富貴角</option>
+    </select>
+
+    <p><button class="btn-update" type="button" onclick="query()">查詢</button></p>
+    <div id="main"></div>
+
+    <script>
+        //取得county和site的值
+        const countyEl = document.querySelector("#county");
+        const siteEl = document.querySelector("#site");
+        const myChart = echarts.init(document.getElementById('main'));
+
+        countyEl.addEventListener('change', () => {
+            console.log("change");
+            let county = countyEl.value;
+            const url = `/pm25_by_site?county=${county}`
+
+            fetch(url)
+                .then(res => res.json())
+                .then(data => {
+                    console.log(data);
+                    siteEl.innerHTML = ""; // 清空選項
+                    // 產生動態option
+                    for (let i = 0; i < data.length; i++) {
+                        const opt = document.createElement("option");
+                        opt.value = data[i];
+                        opt.textContent = data[i];
+                        siteEl.appendChild(opt);
+                    }
+                });
+
+        });
+
+        function plot(chart, site, labels, values) {
+            var myChart = echarts.init(document.getElementById('main'));
+
+            // 指定圖表的配置項目和數據
+            var option = {
+                title: {
+                    text: `${site}PM2.5偵測量`
+                },
+                tooltip: {},
+                legend: {
+                    data: ['μg/m3']
+                },
+                xAxis: {
+                    data: labels
+                },
+                yAxis: {
+                },
+                dataZoom: {
+                    type: 'slider',
+                    start: 0,
+                    end: 100
+                },
+                series: [
+                    {
+                        name: '偵測量',
+                        type: 'line',
+                        smooth: true,
+                        data: values,
+                    }
+                ]
+            };
+            // 使用剛指定的配置項和資料顯示圖表
+            chart.setOption(option);
+
+        }
+
+        function query() {
+            let county = countyEl.value;
+            let site = siteEl.value;
+            const url = `/pm25_by_site?county=${county}%site=${site}`
+
+            fetch(url)
+                .then(res => res.json())
+                .then(data => {
+                    console.log(data);
+                });
+
+            plot(chart, data.site, data.x_data, data.y_data);
+
+            console.log(countyEl.value, siteEl.value, url);
+        }
+    </script>
+
+</body>
+
+</html>
