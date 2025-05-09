@@ -68,6 +68,7 @@ def get_all_counties():
     finally:
         if conn is not None:
             conn.close()
+
     return counties
 
 
@@ -87,26 +88,28 @@ def get_all_sites(county):
     finally:
         if conn is not None:
             conn.close()
+
     return sites
 
 
 def get_pm25_by_site(county, site):
-    conn = None
-    datas = None
-    colnames = None
+    conn, datas, colnames = None, None, None
     try:
         conn = open_db()
         cur = conn.cursor()
         sqlstr = "SELECT * FROM pm25 where county = %s and site = %s;"
         cur.execute(sqlstr, (county, site))
+        # 輸出資料表欄位
         # print(cur.description)
         columns = [i[0] for i in cur.description]
+        # 實際的資料
         datas = cur.fetchall()
     except Exception as e:
-        print("Error executing SQL query:", e)
+        print(e)
     finally:
         if conn is not None:
             conn.close()
+
     return datas, columns
 
 
@@ -119,8 +122,10 @@ def get_pm25_data():
         cur = conn.cursor()
         sqlstr = "SELECT * FROM pm25 where datacreationdate = (select MAX(datacreationdate) from pm25);"
         cur.execute(sqlstr)
+        # 輸出資料表欄位
         # print(cur.description)
         columns = [i[0] for i in cur.description]
+        # 實際的資料
         datas = cur.fetchall()
     except Exception as e:
         print("Error executing SQL query:", e)
@@ -133,4 +138,4 @@ def get_pm25_data():
 if __name__ == "__main__":
     # get_pm25_by_site("臺北市", "大同")
     # print(get_all_counties())
-    get_all_sites("臺北市")
+    print(get_all_sites("臺北市"))

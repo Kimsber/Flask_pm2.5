@@ -8,7 +8,6 @@ from pm25 import (
     get_all_counties,
     get_all_sites,
 )
-import sqlite3
 import json
 
 app = Flask(__name__)
@@ -47,6 +46,8 @@ def pm25_by_site():
             "site": site,
             "x_data": date.to_list(),
             "y_data": df["pm25"].to_list(),
+            "higher": df["pm25"].max(),
+            "lower": df["pm25"].min(),
         }
 
         result = json.dumps(data, ensure_ascii=False)
@@ -77,18 +78,20 @@ def index():
 
     # 取得特定縣市資料(預設ALL)
     county = request.args.get("county", "全部縣市")
+
     if county == "全部縣市":
         # 取得所有縣市的平均值，以縣市為單位
         df1 = df.groupby("county")["pm25"].mean().reset_index()
-        x_data = df1["county"].tolist()
+        x_data = df1["county"].to_list()
     else:
         # 取得特定縣市資料，以測站為單位
         df = df.groupby("county").get_group(county)
+        # 取得繪製資料
         x_data = df["site"].tolist()
 
+    y_data = df["pm25"].tolist()
     columns = df.columns.tolist()
     datas = df.values.tolist()
-    y_data = df["pm25"].tolist()
     # print(columns, datas)
 
     return render_template(

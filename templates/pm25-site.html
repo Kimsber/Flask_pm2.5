@@ -4,13 +4,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>首頁</title>
+    <title>站點PM2.5資訊頁</title>
     <script src="https://cdn.jsdelivr.net/npm/echarts@5.6.0/dist/echarts.min.js"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <style>
         #main {
-            width: 800px;
-            height: 450px;
+            width: 640px;
+            height: 360px;
             align-items: center;
             text-align: center;
             margin: 0 auto;
@@ -19,7 +19,7 @@
 </head>
 
 <body>
-    <h2>{{site}}細懸浮微粒(PM2.5)資料</h2>
+    <h2>細懸浮微粒(PM2.5)資料</h2>
     <h3>選擇縣市</h3>
     <!-- 縣市選擇框 -->
     <select name="county" id="county">
@@ -30,30 +30,38 @@
 
     <h3>選擇站點</h3>
     <select name="site" id="site">
-        <option value="大同">大同</option>
-        <option value="富貴角">富貴角</option>
     </select>
-
     <p><button class="btn-update" type="button" onclick="query()">查詢</button></p>
+    <h2 id="SiteName"></h2>
     <div id="main"></div>
+
+    <div id="panel">
+        <h3 style="color: black;">
+            Higher:<span class="higher" style="color:brown"></span>
+            <br>
+            Lower:<span class="lower" style="color:rgb(0, 110, 255)"></span>
+        </h3>
+    </div>
+
+    <a href="/">回首頁</a>
 
     <script>
         //取得county和site的值
         const countyEl = document.querySelector("#county");
         const siteEl = document.querySelector("#site");
-        const myChart = echarts.init(document.getElementById('main'));
+        const myChart_site = echarts.init(document.getElementById('main'));
 
-        countyEl.addEventListener('change', () => {
-            console.log("change");
+
+        function updateSite() {
             let county = countyEl.value;
-            const url = `/pm25_by_site?county=${county}`
-
+            const url = `/pm25-county-site?county=${county}`
+            //從後端要求資料
             fetch(url)
                 .then(res => res.json())
                 .then(data => {
                     console.log(data);
-                    siteEl.innerHTML = ""; // 清空選項
-                    // 產生動態option
+                    siteEl.innerHTML = "";
+                    //動態產生option
                     for (let i = 0; i < data.length; i++) {
                         const opt = document.createElement("option");
                         opt.value = data[i];
@@ -61,16 +69,22 @@
                         siteEl.appendChild(opt);
                     }
                 });
+        }
 
+
+        updateSite();
+
+
+        countyEl.addEventListener("change", () => {
+            updateSite();
         });
 
-        function plot(chart, site, labels, values) {
-            var myChart = echarts.init(document.getElementById('main'));
 
+        function drawChart(chart, site, labels, values) {
             // 指定圖表的配置項目和數據
             var option = {
                 title: {
-                    text: `${site}PM2.5偵測量`
+                    //text: `${site}PM2.5偵測量`
                 },
                 tooltip: {},
                 legend: {
@@ -81,11 +95,11 @@
                 },
                 yAxis: {
                 },
-                dataZoom: {
+                dataZoom: [{
                     type: 'slider',
                     start: 0,
                     end: 100
-                },
+                }],
                 series: [
                     {
                         name: '偵測量',
@@ -103,15 +117,18 @@
         function query() {
             let county = countyEl.value;
             let site = siteEl.value;
-            const url = `/pm25_by_site?county=${county}%site=${site}`
+            const url = `/pm25-data-site?county=${county}&site=${site}`;
 
             fetch(url)
                 .then(res => res.json())
                 .then(data => {
                     console.log(data);
+                    document.querySelector("#SiteName").innerHTML = `［${county} - ${site}］`;
+                    //取得最高/最低pm25
+                    document.querySelector(".higher").innerHTML = data.higher;
+                    document.querySelector(".lower").innerHTML = data.lower;
+                    drawChart(myChart_site, data.site, data.x_data, data.y_data);
                 });
-
-            plot(chart, data.site, data.x_data, data.y_data);
 
             console.log(countyEl.value, siteEl.value, url);
         }

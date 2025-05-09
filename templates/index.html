@@ -9,8 +9,8 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <style>
         #main {
-            width: 800px;
-            height: 450px;
+            width: 630px;
+            height: 360px;
             align-items: center;
             text-align: center;
             margin: 0 auto;
@@ -27,7 +27,7 @@
     <a class="btn-update" href="/update_db">更新資料</a>
 
     <form action="/" method="GET">
-        <label for="">縣市選擇</label>
+        <label for="county">縣市選擇</label>
         <!-- 縣市選擇框 -->
         <select name="county" id="county">
             <option value="全部縣市">全部縣市</option>
@@ -37,6 +37,8 @@
         </select>
         <button type="submit">查詢</button>
     </form>
+
+    <a href="/pm25-site">詳細站點資訊</a>
 
     <h2 style="margin-left: 64px; color: darkblue;">選擇縣市:{{selected_county}}</h2>
     <table border="1">
@@ -55,6 +57,7 @@
                 {% endfor %}
             </tr>
             {% endfor %}
+        </tbody>
     </table>
 
     <div id="chart-data" data-labels='{{ x_data | tojson }}' data-values='{{ y_data | tojson }}'></div>
