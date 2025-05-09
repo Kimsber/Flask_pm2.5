@@ -38,8 +38,6 @@
         <button type="submit">查詢</button>
     </form>
 
-    <a href="/pm25-site">詳細站點資訊</a>
-
     <h2 style="margin-left: 64px; color: darkblue;">選擇縣市:{{selected_county}}</h2>
     <table border="1">
         <thead>
@@ -61,6 +59,8 @@
     </table>
 
     <div id="chart-data" data-labels='{{ x_data | tojson }}' data-values='{{ y_data | tojson }}'></div>
+
+    <a href="/pm25-site">詳細站點資訊</a>
 
     <script type="text/javascript">
         const ChartData = document.querySelector("#chart-data");
